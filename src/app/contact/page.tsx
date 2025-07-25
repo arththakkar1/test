@@ -37,37 +37,35 @@ const ContactPage = () => {
     });
   };
 
-  type SubmitResponse = {
-    success: boolean;
-    error?: string;
-  };
-
   async function handleSubmit(
     e: React.FormEvent<HTMLFormElement>
-  ): Promise<SubmitResponse> {
-    try {
-      const form = e.currentTarget;
-      const formData = new FormData(form);
+  ): Promise<void> {
+    const response = await handleSubmitEmail(e);
 
-      const res = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
+    if (response?.success) {
+      toast("Catalog downloaded.", {
+        style: {
+          background: "black",
+          color: "#fff",
+          border: "2px solid #32B44A",
         },
-        body: formData,
       });
-
-      const data = await res.json();
-
-      return {
-        success: data.success,
-        error: data.message,
-      };
-    } catch (err: any) {
-      return {
-        success: false,
-        error: err.message || "Something went wrong.",
-      };
+      setFormData({
+        name: "",
+        email: "",
+        company: "",
+        phone: "",
+        message: "",
+      });
+    } else {
+      toast(`Failed: ${response?.message}`, {
+        style: {
+          background: "#ef4444",
+          color: "#fff",
+          border: "2px solid #7f1d1d",
+        },
+      });
+      console.error(response?.message);
     }
   }
 

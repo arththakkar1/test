@@ -24,11 +24,12 @@ const Contacts = () => {
     });
   };
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  async function handleSubmit(
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> {
     const response = await handleSubmitEmail(e);
 
-    if (response.success) {
+    if (response?.success) {
       toast("Catalog downloaded.", {
         style: {
           background: "black",
@@ -44,8 +45,14 @@ const Contacts = () => {
         message: "",
       });
     } else {
-      alert("Failed to send email.");
-      console.error(response.error);
+      toast(`Failed: ${response?.message}`, {
+        style: {
+          background: "#ef4444",
+          color: "#fff",
+          border: "2px solid #7f1d1d",
+        },
+      });
+      console.error(response?.message);
     }
   }
 
