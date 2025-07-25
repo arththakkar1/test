@@ -37,7 +37,7 @@ const ContactPage = () => {
     });
   };
 
-  async function handleSubmit(e: any) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const response = await handleSubmitEmail(e);
 

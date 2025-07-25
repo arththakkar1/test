@@ -2,7 +2,6 @@
 
 import React from "react";
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
-import { Shield, Zap, CheckCircle, Award } from "lucide-react";
 import { sora } from "@/lib/font";
 import { stats } from "@/lib/data";
 
@@ -14,9 +13,25 @@ const About = () => {
     offset: ["start end", "center start"],
   });
 
-  const opacity = useTransform(scrollYProgress, [0, 0.3], [0, 1]);
+  const titleOpacity = useSpring(
+    useTransform(scrollYProgress, [0, 0.3], [0, 1]),
+    { damping: 20, stiffness: 150 }
+  );
 
-  const smoothOpacity = useSpring(opacity, { damping: 20, stiffness: 150 });
+  // ✅ Precompute motion styles for each stat card
+  const motionStyles = stats.map(() => {
+    const y = useSpring(useTransform(scrollYProgress, [0, 1], [40, 0]), {
+      damping: 20,
+      stiffness: 120,
+    });
+
+    const opacity = useSpring(useTransform(scrollYProgress, [0, 0.3], [0, 1]), {
+      damping: 20,
+      stiffness: 150,
+    });
+
+    return { y, opacity };
+  });
 
   return (
     <section
@@ -26,7 +41,7 @@ const About = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <motion.div
-          style={{ opacity: smoothOpacity }}
+          style={{ opacity: titleOpacity }}
           className="text-center relative"
         >
           <div className="space-y-8">
@@ -47,25 +62,12 @@ const About = () => {
             <motion.div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-4xl mx-auto relative z-10">
               {stats.map((stat, index) => {
                 const IconComponent = stat.icon;
+                const { y, opacity } = motionStyles[index];
+
                 return (
                   <motion.div
                     key={index}
-                    style={{
-                      y: useSpring(
-                        useTransform(scrollYProgress, [0, 1], [40, 0]),
-                        {
-                          damping: 20,
-                          stiffness: 120,
-                        }
-                      ),
-                      opacity: useSpring(
-                        useTransform(scrollYProgress, [0, 0.3], [0, 1]),
-                        {
-                          damping: 20,
-                          stiffness: 150,
-                        }
-                      ),
-                    }}
+                    style={{ y, opacity }}
                     className="text-center md:flex flex-col justify-between p-6 bg-gray-900/70 rounded-lg border-2 border-gray-700/40 hover:border-[#32B44A]/50 transition-all duration-300"
                   >
                     <div>
@@ -76,7 +78,6 @@ const About = () => {
                         {stat.value}
                       </div>
                     </div>
-
                     <div className="text-gray-400 ">{stat.label}</div>
                   </motion.div>
                 );

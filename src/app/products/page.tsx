@@ -26,47 +26,13 @@ import {
   DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Drawer } from "@/components/ui/drawer";
 import Image from "next/image";
 import Link from "next/link";
 
-// Custom Modal Component
-type CustomModalProps = {
-  open: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
-};
 
-const CustomModal = ({ open, onClose, children }: CustomModalProps) => {
-  if (!open) return null;
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
-      onClick={onClose}
-    >
-      <div
-        className="bg-white rounded-xl shadow-lg max-w-lg w-full p-6 relative"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-2xl"
-          onClick={onClose}
-          aria-label="Close"
-        >
-          &times;
-        </button>
-        {children}
-      </div>
-    </div>
-  );
-};
 
 // Define the Product interface
 interface Product {
@@ -141,7 +107,6 @@ const ProductsPage = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   // Ref for the button to scroll into view
-  const buttonRef = useRef<HTMLButtonElement>(null);
 
   // Filtered products based on selected category and search term
   const filteredProducts = products.filter((product) => {

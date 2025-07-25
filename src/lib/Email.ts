@@ -1,5 +1,20 @@
-export async function handleSubmitEmail(e: any) {
+type Web3FormsResponse = {
+  success: boolean;
+  message: string;
+  data?: unknown;
+};
+
+export async function handleSubmitEmail(e: React.FormEvent<HTMLFormElement>) {
   e.preventDefault();
+
+  const target = e.target as typeof e.target & {
+    name: { value: string };
+    email: { value: string };
+    message: { value: string };
+    company: { value: string };
+    phone: { value: string };
+  };
+
   const response = await fetch("https://api.web3forms.com/submit", {
     method: "POST",
     headers: {
@@ -8,20 +23,18 @@ export async function handleSubmitEmail(e: any) {
     },
     body: JSON.stringify({
       access_key: process.env.NEXT_PUBLIC_API_URL,
-      name: e.target.name.value,
-      email: e.target.email.value,
-      message: e.target.message.value
+      name: target.name.value,
+      email: target.email.value,
+      message: target.message.value
         .concat(
-          e.target.company.value
-            ? `\n\nCompany: ${e.target.company.value}` // will appear as **COMPANY:** in plain text
-            : ""
+          target.company.value ? `\n\nCompany: ${target.company.value}` : ""
         )
-        .concat(
-          e.target.phone.value ? `\n\nPhone: ${e.target.phone.value}` : ""
-        ),
+        .concat(target.phone.value ? `\n\nPhone: ${target.phone.value}` : ""),
     }),
   });
-  const result = await response.json();
+
+  const result: Web3FormsResponse = await response.json();
+
   if (result.success) {
     return result;
   }

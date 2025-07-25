@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Shield, Zap, CheckCircle } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { sora } from "@/lib/font";
 import Link from "next/link";
 import { HeroCard } from "@/lib/data";
