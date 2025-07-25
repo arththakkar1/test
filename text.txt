@@ -1,0 +1,431 @@
+/* eslint-disable @next/next/no-img-element */
+"use client";
+
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import {
+  Search,
+  ArrowRight,
+  Shield,
+  Zap,
+  CheckCircle,
+  Check,
+  ChevronsUpDown,
+} from "lucide-react";
+
+import { cn } from "@/lib/utils"; // Assuming this utility function exists
+import { Button } from "@/components/ui/button"; // Assuming these UI components exist
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { sora } from "@/lib/font"; // Assuming your font definition exists
+import { data } from "@/lib/data";
+
+// Define the Product interface
+interface Product {
+  id?: string;
+  name?: string;
+  category?: string;
+  image?: string;
+  description?: string;
+  features?: string[];
+  specifications?: { [key: string]: string | undefined };
+  applications?: string[];
+  price?: string;
+}
+
+// Product data
+const products: Product[] = data;
+
+// Product categories for filtering, including the 'All' option
+const categories = [
+  { value: "All", label: "All" }, // Changed 'all' to 'All' to match default state
+  { value: "Earthing Pit Cover", label: "Earthing Pit Cover" },
+  { value: "RCC Chamber", label: "RCC Chamber" },
+  {
+    value: "Pure Copper Earth Electrode & Rod",
+    label: "Pure Copper Earth Electrode & Rod",
+  },
+  {
+    value: "Copper Bonded Solid Earth Rod",
+    label: "Copper Bonded Solid Earth Rod",
+  },
+  { value: "Copper Plate Earthing", label: "Copper Plate Earthing" },
+  {
+    value: "Copper Bonded Chemical Earth Electrode",
+    label: "Copper Bonded Chemical Earth Electrode",
+  },
+  { value: "GI-Earth Electrode", label: "GI-Earth Electrode" },
+  { value: "PV Backfill Compound", label: "PV Backfill Compound   " },
+  {
+    value: "PV All Types of G.I. Strips",
+    label: "PV All Types of G.I. Strips",
+  },
+  { value: "PV Copper Earthing Strip", label: "PV Copper Earthing Strip" },
+  {
+    value: "Copper/ Copper Bonded/ Spike lightning Arrester",
+    label: "Copper/ Copper Bonded/ Spike lightning Arrester",
+  },
+  { value: "Lightning arrester", label: "Lightning arrester" },
+  {
+    value: "Digital Lightning Strike Counter",
+    label: "Digital Lightning Strike Counter",
+  },
+  // Removed redundant/less specific categories like 'grounding', 'lightning', 'chemical', etc.
+  // as the existing products use specific categories like 'Protection', 'Systems', 'Electrodes'.
+  // If you have products that fit these, you can re-add them and assign to products.
+];
+
+const ProductsPage = () => {
+  // State for the mobile category dropdown (Popover/Command)
+  const [open, setOpen] = useState(false);
+  // State to hold the value selected in the mobile dropdown (matches category.value)
+  const [setValue] = useState("All"); // Initialize to "All"
+
+  // State for the currently selected product category (used for filtering)
+  const [selectedCategory, setSelectedCategory] = useState("All"); // Initialize to "All"
+
+  // State for the search term
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // State for holding the product selected for detailed view in the modal
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  // Filtered products based on selected category and search term
+  const filteredProducts = products.filter((product) => {
+    // Check if the product's category matches the selected category
+    // "All" category matches all products
+    const matchesCategory =
+      selectedCategory === "All" || product.category === selectedCategory;
+
+    // Check if the product's name or description includes the search term (case-insensitive)
+    const matchesSearch =
+      product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.description?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    return matchesCategory && matchesSearch;
+  });
+
+  // Handler for mobile dropdown category selection
+  const handleMobileCategorySelect = (currentValue: string) => {
+    setValue(currentValue); // Update the internal value of the combobox
+    setSelectedCategory(currentValue); // Update the main category filter state
+    setOpen(false); // Close the popover
+  };
+
+  return (
+    <div className="pt-24 bg-gradient-to-r from-[#11312c] to-[#1a4a42] min-h-screen">
+      {/* Hero Section */}
+      <section className="py-16 bg-gradient-to-r from-[#11312c] to-[#1a4a42]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center"
+          >
+            <h1
+              className={`text-4xl md:text-5xl ${sora.className} font-bold text-white mb-6`}
+            >
+              Our <span className="text-[#FECE09]">Product</span> Range
+            </h1>
+            <p className="text-lg md:text-xl font-medium text-white/60 max-w-3xl mx-auto">
+              Comprehensive earthing and grounding solutions engineered for
+              safety, reliability, and performance across diverse applications.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Search and Filter Section */}
+      <section className="py-8 mx-4 md:mx-24 rounded-2xl bg-black/20">
+        <div className="max-w-full flex flex-col mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-6 items-center justify-between">
+            {/* Search Input */}
+            <div className="relative w-full flex-1 max-w-full">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-white/10 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#32B44A]"
+              />
+            </div>
+
+            {/* Category Filter Buttons (Desktop) */}
+            <div className="hidden md:flex justify-center flex-wrap gap-2">
+              {categories.map((category) => (
+                <button
+                  key={category.value}
+                  onClick={() => setSelectedCategory(category.value)}
+                  className={`px-4 py-2 rounded-lg cursor-pointer font-medium transition-all duration-200 ${
+                    selectedCategory === category.value
+                      ? "bg-[#32B44A] text-white"
+                      : "bg-white/10 text-gray-300 hover:bg-white/20"
+                  }`}
+                >
+                  {category.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Category Filter Dropdown (Mobile) */}
+            <div className="md:hidden w-full">
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={open}
+                    className="w-full justify-between border border-gray-700 bg-neutral-900 text-white hover:bg-neutral-800"
+                  >
+                    {selectedCategory
+                      ? categories.find((cat) => cat.value === selectedCategory)
+                          ?.label
+                      : "Select category"}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0 border border-gray-700 bg-neutral-900 text-white">
+                  <Command className="bg-neutral-900 text-white">
+                    <CommandInput
+                      placeholder="Search categories..."
+                      className="placeholder:text-gray-400 bg-neutral-900 text-white"
+                    />
+                    <CommandList>
+                      <CommandEmpty>No category found.</CommandEmpty>
+                      <CommandGroup>
+                        {categories.map((cat) => (
+                          <CommandItem
+                            key={cat.value}
+                            value={cat.value}
+                            className={cn(
+                              "cursor-pointer text-white hover:bg-neutral-800",
+                              selectedCategory === cat.value &&
+                                "bg-neutral-800 text-white" // Keep selected item styled as selected
+                            )}
+                            onSelect={() =>
+                              handleMobileCategorySelect(cat.value)
+                            }
+                          >
+                            {cat.label}
+                            <Check
+                              className={cn(
+                                "ml-auto h-4 w-4",
+                                selectedCategory === cat.value
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Products Grid */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-4 gap-8">
+            {/* Display message if no products found after filtering */}
+            {filteredProducts.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="col-span-full text-center text-gray-400 text-lg py-12"
+              >
+                No products found matching your criteria.
+              </motion.div>
+            )}
+
+            {filteredProducts.map((product, index) => (
+              <motion.div
+                key={product.id}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1, duration: 0.6 }}
+                className="bg-black/60 border border-gray-700 rounded-xl overflow-hidden hover:border-[#32B44A]/100 border-2 transition-all duration-300 group"
+              >
+                <div className="relative h-48 overflow-hidden">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[#32B44A] md:text-xl text-sm font-medium">
+                      {product.category}
+                    </span>
+                  </div>
+
+                  <h3 className="text-xl font-bold text-[#FECE09] mb-3">
+                    {product.name}
+                  </h3>
+                  <p className="text-gray-300 text-sm mb-4 line-clamp-3">
+                    {product.description}
+                  </p>
+
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {product.features?.slice(0, 2).map((feature, idx) => (
+                      <span
+                        key={idx}
+                        className="bg-[#32B44A]/20 text-[#32B44A] px-2 py-1 rounded-md text-xs"
+                      >
+                        {feature}
+                      </span>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => setSelectedProduct(product)}
+                    className="w-full bg-[#32B44A] text-white cursor-pointer py-3 rounded-lg font-semibold hover:bg-[#2a9d3f] transition-colors duration-200 flex items-center justify-center space-x-2"
+                  >
+                    <span>View Details</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Product Detail Modal */}
+      {selectedProduct && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-[#11312c] border border-gray-700 rounded-xl max-w-full mx-2 md:mx-40 w-full max-h-[90vh] overflow-y-auto"
+          >
+            <div className="p-6">
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h2 className="text-3xl font-bold text-[#FECE09] mb-2">
+                    {selectedProduct.name}
+                  </h2>
+                  <div className="flex items-center space-x-4">
+                    <span className="text-[#32B44A] font-medium">
+                      {selectedProduct.category}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedProduct(null)}
+                  className="text-gray-400 cursor-pointer hover:text-white text-2xl"
+                  aria-label="Close"
+                >
+                  &times; {/* Using HTML entity for a clear 'x' */}
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div>
+                  <img
+                    src={selectedProduct.image}
+                    alt={selectedProduct.name}
+                    className="w-full h-64 object-cover rounded-lg mb-6"
+                  />
+                  <p className="text-gray-300 leading-relaxed">
+                    {selectedProduct.description}
+                  </p>
+                </div>
+
+                <div className="space-y-6">
+                  {/* Features */}
+                  <div>
+                    <h3 className="text-xl font-bold text-white mb-3 flex items-center">
+                      <CheckCircle className="w-5 h-5 text-[#32B44A] mr-2" />
+                      Key Features
+                    </h3>
+                    <ul className="space-y-2">
+                      {selectedProduct.features?.map((feature, idx) => (
+                        <li
+                          key={idx}
+                          className="text-gray-300 flex items-center"
+                        >
+                          <div className="w-2 h-2 bg-[#32B44A] rounded-full mr-3"></div>
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Specifications */}
+                  <div>
+                    <h3 className="text-xl font-bold text-white mb-3 flex items-center">
+                      <Shield className="w-5 h-5 text-[#FECE09] mr-2" />
+                      Specifications
+                    </h3>
+                    <div className="space-y-2">
+                      {Object.entries(selectedProduct.specifications ?? {}).map(
+                        ([key, value]) => (
+                          <div
+                            key={key}
+                            className="flex justify-between border-b border-gray-700 pb-2"
+                          >
+                            <span className="text-gray-400 w-[50%]">
+                              {key}:
+                            </span>
+                            <span className="text-white">{value}</span>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Applications */}
+                  <div>
+                    <h3 className="text-xl font-bold text-white mb-3 flex items-center">
+                      <Zap className="w-5 h-5 text-orange-400 mr-2" />
+                      Applications
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedProduct.applications?.map((app, idx) => (
+                        <span
+                          key={idx}
+                          className="bg-gray-800 text-gray-300 px-3 py-1 rounded-lg text-sm"
+                        >
+                          {app}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-4">
+                    <button className="w-full bg-[#32B44A] text-white py-3 rounded-lg cursor-pointer font-semibold hover:bg-[#2a9d3f] transition-colors duration-200">
+                      Request Quote
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ProductsPage;
