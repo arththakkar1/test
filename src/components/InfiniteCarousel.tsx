@@ -5,17 +5,17 @@ import * as React from "react";
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { sora } from "@/lib/font";
 import { Card, Carousel } from "./ui/carousel";
-import { data as ProductData } from "@/lib/data";
+import { data as ProductData, ProductType } from "@/lib/data";
 import Image from "next/image";
 import { groupByCategory } from "@/lib/Category";
 
-const grouped = groupByCategory(ProductData);
+const grouped = groupByCategory(ProductData as ProductType[]);
 
 const DummyContent = ({
   products,
 }: {
   category: string;
-  products: typeof ProductData;
+  products: ProductType[];
 }) => (
   <div className=" p-6 md:p-5 rounded-3xl mb-6">
     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

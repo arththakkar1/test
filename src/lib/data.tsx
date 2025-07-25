@@ -1,6 +1,37 @@
 import { Shield, Zap, CheckCircle, Award } from "lucide-react";
 
-export const data = [
+export type ProductType = {
+  id: string;
+  name: string;
+  category: string;
+  image: string;
+  description: string;
+  features: string[];
+  specifications: {
+    [key: string]: string | undefined;
+    Dimentions?: string;
+    Material?: string;
+    "Weight in KG"?: string;
+  };
+  applications: string[];
+  price: string;
+
+  // Add this 👇
+  protectionRadius?: {
+    [radius: string]: {
+      level1: number;
+      level2: number;
+      level3: number;
+      level4: number;
+    };
+  };
+
+  installationAccessories?: {
+    [key: string]: string[];
+  };
+};
+
+export const data: ProductType[] = [
   {
     id: "1",
     name: "PV MICRO - 6''",
