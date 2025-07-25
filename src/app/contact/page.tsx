@@ -37,28 +37,37 @@ const ContactPage = () => {
     });
   };
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const response = await handleSubmitEmail(e);
+  type SubmitResponse = {
+    success: boolean;
+    error?: string;
+  };
 
-    if (response.success) {
-      toast("Catalog downloaded.", {
-        style: {
-          background: "black",
-          color: "#fff",
-          border: "2px solid #32B44A",
+  async function handleSubmit(
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<SubmitResponse> {
+    try {
+      const form = e.currentTarget;
+      const formData = new FormData(form);
+
+      const res = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
         },
+        body: formData,
       });
-      setFormData({
-        name: "",
-        email: "",
-        company: "",
-        phone: "",
-        message: "",
-      });
-    } else {
-      alert("Failed to send email.");
-      console.error(response.error);
+
+      const data = await res.json();
+
+      return {
+        success: data.success,
+        error: data.message,
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        error: err.message || "Something went wrong.",
+      };
     }
   }
 
