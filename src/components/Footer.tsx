@@ -69,7 +69,7 @@ const Footer = () => {
               className="flex items-center space-x-3 group cursor-pointer"
             >
               <Image
-                src="/logo.svg"
+                src="/Logo.svg"
                 alt="Logo"
                 width={100}
                 height={100}
